@@ -1,1 +1,4 @@
-search
+.DS_Store
+search/__pycache__
+search/layouts
+search/test_cases
