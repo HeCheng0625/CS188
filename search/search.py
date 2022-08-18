@@ -17,8 +17,7 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
-import queue
-from util import Stack, Queue
+from util import Stack, Queue, PriorityQueue
 import util
 
 class SearchProblem:
@@ -144,6 +143,28 @@ def breadthFirstSearch(problem: SearchProblem):
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    pq = PriorityQueue()
+    start_state = problem.getStartState()
+    pq.push((start_state, 0), 0)
+    reached = {start_state: None}
+    father = {start_state: None}
+
+    while not pq.isEmpty():
+        state, total_cost = pq.pop()
+        if problem.isGoalState(state):
+            break
+        for successor, action, cost in problem.getSuccessors(state):
+            if successor not in reached.keys():
+                pq.push((successor, total_cost + cost), total_cost + cost)
+                father[successor] = state
+                reached[successor] = action
+    
+    actions = []
+    while father[state] != None:
+        actions.append(reached[state])
+        state = father[state]
+
+    return actions[::-1]
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -156,6 +177,28 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    pq = PriorityQueue()
+    start_state = problem.getStartState()
+    pq.push(start_state, heuristic(start_state, problem))
+    reached = {start_state: None}
+    father = {start_state: None}
+
+    while not pq.isEmpty():
+        state = pq.pop()
+        if problem.isGoalState(state):
+            break
+        for successor, action, _ in problem.getSuccessors(state):
+            if successor not in reached.keys():
+                pq.push(successor, heuristic(successor, problem))
+                father[successor] = state
+                reached[successor] = action
+    
+    actions = []
+    while father[state] != None:
+        actions.append(reached[state])
+        state = father[state]
+
+    return actions[::-1]
     util.raiseNotDefined()
 
 
