@@ -1,4 +1,4 @@
 .DS_Store
-search/__pycache__
-search/layouts
-search/test_cases
+*/__pycache__
+*/layouts
+*/test_cases
