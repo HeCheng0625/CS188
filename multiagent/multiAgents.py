@@ -85,7 +85,7 @@ class ReflexAgent(Agent):
             if newScaredTimes[i] == 0:
                 minGhostDistance = min(minGhostDistance,
                 manhattanDistance(newPos, newGhostStates[i].getPosition()))
-        return successorGameState.getScore() - minFoodDistance + minGhostDistance ** 2
+        return successorGameState.getScore() - minFoodDistance / 2 + minGhostDistance / 8
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
@@ -146,7 +146,37 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+        return self.miniMax(gameState, 0, self.depth)[1]
         util.raiseNotDefined()
+
+    def miniMax(self, gameState: GameState, agentIndex, depth):
+        if depth == 0 or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState), Directions.STOP
+        if agentIndex == 0:
+            resultValue = -9999999
+            resultAction = Directions.STOP
+            legalActions = gameState.getLegalActions(agentIndex)
+            for action in legalActions:
+                successorState = gameState.generateSuccessor(agentIndex, action)
+                currentValue = self.miniMax(successorState,
+                        (agentIndex + 1) % gameState.getNumAgents(),
+                        depth - (agentIndex + 1) // gameState.getNumAgents())[0]
+                if resultValue < currentValue:
+                    resultValue = currentValue
+                    resultAction = action
+        else:
+            resultValue = 9999999
+            resultAction = Directions.STOP
+            legalActions = gameState.getLegalActions(agentIndex)
+            for action in legalActions:
+                successorState = gameState.generateSuccessor(agentIndex, action)
+                currentValue = self.miniMax(successorState,
+                        (agentIndex + 1) % gameState.getNumAgents(),
+                        depth - (agentIndex + 1) // gameState.getNumAgents())[0]
+                if resultValue > currentValue:
+                    resultValue = currentValue
+                    resultAction = action
+        return resultValue, resultAction
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -159,6 +189,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
